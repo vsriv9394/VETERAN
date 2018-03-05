@@ -1,4 +1,4 @@
-function create_Geometry(Meshfile,Cells,SurfX,SurfY,SurfZ)
+function create_Geometry(Meshfile,Cells,SurfX,SurfY,SurfZ,X,Y,Z)
     
     Mesh    = readdlm(string(Meshfile,".mesh"))
     
