@@ -26,10 +26,10 @@ function flow_eval(scheme,Cells,SurfX,SurfY,SurfZ,gamma,R)
                 Flow_local  =   Area*setbcflux(scheme,stateL,stateR,gamma,R,surf,ext_side)
                 for m=1:5
                     if i!=1
-                        Flow[i  ,j+1,k+1,m] =   Flow[i  ,j+1,k+1,m]-Flow_local/Cells[i  ,j+1,k+1,6]
+                        Flow[i  ,j+1,k+1,m] =   Flow[i  ,j+1,k+1,m]-Flow_local[m]/Cells[i  ,j+1,k+1,6]
                     end
                     if i!=size(SurfX,1)
-                        Flow[i+1,j+1,k+1,m] =   Flow[i+1,j+1,k+1,m]+Flow_local/Cells[i+1,j+1,k+1,6]
+                        Flow[i+1,j+1,k+1,m] =   Flow[i+1,j+1,k+1,m]+Flow_local[m]/Cells[i+1,j+1,k+1,6]
                     end
                 end
             end
@@ -53,10 +53,10 @@ function flow_eval(scheme,Cells,SurfX,SurfY,SurfZ,gamma,R)
                 Flow_local  =   Area*setbcflux(scheme,stateL,stateR,gamma,R,surf,ext_side)
                 for m=1:5
                     if j!=1
-                        Flow[i+1,j  ,k+1,m] =   Flow[i+1,j  ,k+1,m]-Flow_local/Cells[i+1,j  ,k+1,6]
+                        Flow[i+1,j  ,k+1,m] =   Flow[i+1,j  ,k+1,m]-Flow_local[m]/Cells[i+1,j  ,k+1,6]
                     end
                     if j!=size(SurfY,1)
-                        Flow[i+1,j+1,k+1,m] =   Flow[i+1,j+1,k+1,m]+Flow_local/Cells[i+1,j+1,k+1,6]
+                        Flow[i+1,j+1,k+1,m] =   Flow[i+1,j+1,k+1,m]+Flow_local[m]/Cells[i+1,j+1,k+1,6]
                     end
                 end
             end
@@ -80,10 +80,10 @@ function flow_eval(scheme,Cells,SurfX,SurfY,SurfZ,gamma,R)
                 Flow_local  =   Area*setbcflux(scheme,stateL,stateR,gamma,R,surf,ext_side)
                 for m=1:5
                     if k!=1
-                        Flow[i+1,j+1,k  ,m] =   Flow[i+1,j+1,k  ,m]-Flow_local/Cells[i+1,j+1,k  ,6]
+                        Flow[i+1,j+1,k  ,m] =   Flow[i+1,j+1,k  ,m]-Flow_local[m]/Cells[i+1,j+1,k  ,6]
                     end
                     if k!=size(SurfZ,1)
-                        Flow[i+1,j+1,k+1,m] =   Flow[i+1,j+1,k+1,m]+Flow_local/Cells[i+1,j+1,k+1,6]
+                        Flow[i+1,j+1,k+1,m] =   Flow[i+1,j+1,k+1,m]+Flow_local[m]/Cells[i+1,j+1,k+1,6]
                     end
                 end
             end

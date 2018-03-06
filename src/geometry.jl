@@ -1,4 +1,4 @@
-function create_Geometry(Meshfile,Cells,SurfX,SurfY,SurfZ,X,Y,Z)
+function create_Geometry(Meshfile)
     
     Mesh    = readdlm(string(Meshfile,".mesh"))
     
@@ -6,41 +6,18 @@ function create_Geometry(Meshfile,Cells,SurfX,SurfY,SurfZ,X,Y,Z)
     DimY    = convert(Int, Mesh[1,2])
     DimZ    = convert(Int, Mesh[1,3])
     
-    X       = zeros(DimX,DimY,DimZ)
-    Y       = zeros(DimX,DimY,DimZ)
-    Z       = zeros(DimX,DimY,DimZ)
+    X       = reshape(Mesh[2:end,1],(DimX,DimY,DimZ))
+    Y       = reshape(Mesh[2:end,2],(DimX,DimY,DimZ))
+    Z       = reshape(Mesh[2:end,3],(DimX,DimY,DimZ))
     
-    X_temp  = reshape(Mesh[2:end,1],(DimY,DimZ,DimX))
-    for i=1:DimX
-        for j=1:DimY
-            for k=1:DimZ
-                X[i,j,k] = X_temp[j,k,i]
-            end
-        end
-    end
-    
-    Y_temp  = reshape(Mesh[2:end,2],(DimZ,DimX,DimY))
-    for i=1:DimX
-        for j=1:DimY
-            for i=1:DimZ
-                Y[i,j,k] = Y_temp[k,i,j]
-            end
-        end
-    end
-    
-    Z_temp  = reshape(Mesh[2:end,3],(DimX,DimY,DimZ))
-    for i=1:DimX
-        for j=1:DimY
-            for k=1:DimZ
-                Z[i,j,k] = Z_temp[i,j,k]
-            end
-        end
-    end
-    
+    println("Beginning Mesh Setup and State Initialization")
     Cells   = zeros(DimX+1, DimY+1, DimZ+1, 6) # States and Volume
-    SurfX   = zeros(Dimx  , DimY-1, DimZ-1, 4) # Normal Vector & Area & Boundary Type
-    SurfY   = zeros(Dimx-1, DimY  , DimZ-1, 4) # Normal Vector & Area & Boundary Type
-    SurfZ   = zeros(Dimx-1, DimY-1, DimZ  , 4) # Normal Vector & Area & Boundary Type
+    Cells[:,:,:,1]  =   1.225
+    Cells[:,:,:,5]  =   300000
+
+    SurfX   = zeros(DimX  , DimY-1, DimZ-1, 4) # Normal Vector & Area & Boundary Type
+    SurfY   = zeros(DimX-1, DimY  , DimZ-1, 4) # Normal Vector & Area & Boundary Type
+    SurfZ   = zeros(DimX-1, DimY-1, DimZ  , 4) # Normal Vector & Area & Boundary Type
     
     for i=2:DimX
         for j=2:DimY
@@ -175,8 +152,8 @@ function create_Geometry(Meshfile,Cells,SurfX,SurfY,SurfZ,X,Y,Z)
         end
     end
 
-    setupbc(Meshfile,Cells,SurfX,SurfY,SurfZ)
+    println("Initialization Finished")
 
-    return nothing
+    return Cells,SurfX,SurfY,SurfZ,X,Y,Z
     
 end

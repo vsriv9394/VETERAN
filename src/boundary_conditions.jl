@@ -58,6 +58,8 @@ function setbcflux(scheme,stateL,stateR,gamma,R,surf,ext_side)
             state   =   stateL
             stateb  =   stateR
         end
+        
+        c_t     =   stateb[1]
 
         v       =   [0.0,0.0,0.0]
         v[1]    =   state[2]/state[1]
@@ -68,17 +70,17 @@ function setbcflux(scheme,stateL,stateR,gamma,R,surf,ext_side)
 
         ke      =   0.5*state[1]*(v[1]^2+v[2]^2+v[3]^2)
 
-        c       =   gamma*(gamma-1)*(state[5]-ke)/state[1]
+        c       =   sqrt(gamma*(gamma-1)*(state[5]-ke)/state[1])
 
         J       =   v_nm+2*c/(gamma-1)
         d_n     =   stateb[2]*n[1]+stateb[3]*n[2]+stateb[4]*n[3]
 
-        aaa     =   c_t*d_n^2-0.5*(gamma-1)*J^2
-        bbb     =   4*c_t*d_n/(gamma-1)
-        ccc     =   4*c_t/(gamma-1)^2-J^2
+        aaa     =   c_t^2*d_n^2-0.5*(gamma-1)*J^2
+        bbb     =   4*c_t^2*d_n/(gamma-1)
+        ccc     =   4*c_t^2/(gamma-1)^2-J^2
 
-        M_b     =   (sqrt(bbb^2-4*aaa*ccc)-bbb)/(2*aaa)
-        c_b     =   c_t/(1+0.5*(gamma-1)M_b^2)
+        M_b     =   (sqrt(bbb*bbb-4*aaa*ccc)-bbb)/(2*aaa)
+        c_b     =   c_t/sqrt(1+0.5*(gamma-1)M_b^2)
 
         p_t     =   stateb[5]
         p_b     =   p_t*(c_b/c_t)^(2*gamma/(gamma-1))

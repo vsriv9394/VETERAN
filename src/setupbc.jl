@@ -1,8 +1,10 @@
 function setupbc(Meshfile,Cells,SurfX,SurfY,SurfZ)
 
     # Compile Periodic Boundary Conditions
-    BC  =   readdlm(string(Meshfile,"bc"))      # Surface Element Indices,BC_Marker
-    IP  =   readdlm(string(Meshfile,"inp"))     # line_number: BC_Marker,states,BC_type
+    BCf =   readdlm(string(Meshfile,".bc"))      # Surface Element Indices,BC_Marker
+    IP  =   readdlm(string(Meshfile,".inp"))     # line_number: BC_Marker,states,BC_type
+
+    BC  =   round.(Int,BCf)
     
     DimX    =   size(Cells,1)-1
     DimY    =   size(Cells,2)-1
