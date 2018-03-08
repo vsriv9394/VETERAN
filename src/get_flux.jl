@@ -1,4 +1,4 @@
-function getflux(scheme,UL,UR,gamma,R,n,Area)
+function getflux(scheme,UL,UR,gamma,n,Area)
     
     F = UL
 
@@ -7,19 +7,24 @@ function getflux(scheme,UL,UR,gamma,R,n,Area)
         gmi = gamma-1.0;
         
         # process left state
-        rL = UL[1]
+        rL = UL[1]+1e-10
         uL = UL[2]/rL
         vL = UL[3]/rL
         wL = UL[4]/rL
+
         unL = uL*n[1] + vL*n[2] + wL*n[3]
+
         qL = sqrt(UL[2]^2 + UL[3]^2 + UL[4]^2)/rL
+
         pL = (gamma-1)*(UL[5] - 0.5*rL*qL^2)
+
         if ((pL<=0) || (rL<=0))
-            println("Negative density or pressure")
+            println("Negative density or pressure left cell")
         end
+
         rHL = UL[5] + pL
         HL = rHL/rL
-        cL = sqrt(gamma*pL/rL)
+        cL = sqrt(abs(gamma*pL/rL))
         
         # left flux
         FL = UL # for allocation
@@ -30,19 +35,24 @@ function getflux(scheme,UL,UR,gamma,R,n,Area)
         FL[5] = rHL*unL
         
         # process right state
-        rR = UR[1]
+        rR = UR[1]+1e-10
         uR = UR[2]/rR
         vR = UR[3]/rR
         wR = UR[4]/rR
+
         unR = uR*n[1] + vR*n[2] + wR*n[3]
+
         qR = sqrt(UR[2]^2 + UR[3]^2 + UR[4]^2)/rR
+        
         pR = (gamma-1)*(UR[5] - 0.5*rR*qR^2)
+
         if ((pR<=0) || (rR<=0))
-            println("Negative density or pressure")
+            println("Negative density or pressure right cell")
         end
+
         rHR = UR[5] + pR
         HR = rHR/rR
-        cR = sqrt(gamma*pR/rR)
+        cR = sqrt(abs(gamma*pR/rR))
         
         # right flux
         FR = UR # for allocation
@@ -56,7 +66,7 @@ function getflux(scheme,UL,UR,gamma,R,n,Area)
         du = UR - UL;
         
         # Roe average
-        di     = sqrt(rR/rL)
+        di     = sqrt(abs(rR/rL))
         d1     = 1.0/(1.0+di)
         
         ui     = (di*uR + uL)*d1
@@ -70,7 +80,7 @@ function getflux(scheme,UL,UR,gamma,R,n,Area)
         if (c2<=0)
             println("Imaginary Wavespeed")
         end
-        ci     = sqrt(c2);
+        ci     = sqrt(abs(c2));
         ci1    = 1.0/ci;
         
         # eigenvalues
@@ -81,13 +91,13 @@ function getflux(scheme,UL,UR,gamma,R,n,Area)
         
         # entropy fix
         epsilon = ci*0.1
+        l = abs.(l)
         for i=1:3
-            if ((l[i]<epsilon) && (l[i]>-epsilon))
+            if l[i]<epsilon
                 l[i] = 0.5*(epsilon + l[i]*l[i]/epsilon)
             end
         end
         
-        l = abs.(l)
         l3 = l[3]
         
         # average and half-difference of 1st and 2nd eigs

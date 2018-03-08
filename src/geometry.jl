@@ -1,4 +1,4 @@
-function create_Geometry(Meshfile)
+function create_Geometry(Meshfile,Restartfile)
     
     Mesh    = readdlm(string(Meshfile,".mesh"))
     
@@ -10,10 +10,9 @@ function create_Geometry(Meshfile)
     Y       = reshape(Mesh[2:end,2],(DimX,DimY,DimZ))
     Z       = reshape(Mesh[2:end,3],(DimX,DimY,DimZ))
     
-    println("Beginning Mesh Setup and State Initialization")
-    Cells   = zeros(DimX+1, DimY+1, DimZ+1, 6) # States and Volume
-    Cells[:,:,:,1]  =   1.225
-    Cells[:,:,:,5]  =   300000
+    println("Beginning Mesh Setup and Geometry Initialization")
+    Cells   = reshape(reinterpret(Float64,read(Restartfile)),DimX+1,DimY+1,DimZ+1,6)
+    println("Initial/Restart file loaded")
 
     SurfX   = zeros(DimX  , DimY-1, DimZ-1, 4) # Normal Vector & Area & Boundary Type
     SurfY   = zeros(DimX-1, DimY  , DimZ-1, 4) # Normal Vector & Area & Boundary Type
@@ -152,7 +151,11 @@ function create_Geometry(Meshfile)
         end
     end
 
-    println("Initialization Finished")
+    println("Mesh Setup and Geometry Initialization Finished")
+    println("Maximum X-Area\t\t\t",maximum(SurfX[:,:,:,1]),"\nMinimum X-Area\t\t\t",minimum(SurfX[:,:,:,1]),"\n")
+    println("Maximum Y-Area\t\t\t",maximum(SurfY[:,:,:,2]),"\nMinimum Y-Area\t\t\t",minimum(SurfY[:,:,:,2]),"\n")
+    println("Maximum Z-Area\t\t\t",maximum(SurfZ[:,:,:,3]),"\nMinimum Z-Area\t\t\t",minimum(SurfZ[:,:,:,3]),"\n")
+    println("Maximum Cell Volume\t\t",maximum(Cells[2:end-1,2:end-1,2:end-1,6]),"\nMinimum Cell Volume\t\t",minimum(Cells[2:end-1,2:end-1,2:end-1,6]),"\n")
 
     return Cells,SurfX,SurfY,SurfZ,X,Y,Z
     

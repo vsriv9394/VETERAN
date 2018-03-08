@@ -1,4 +1,4 @@
-function setbcflux(scheme,stateL,stateR,gamma,R,surf,ext_side)
+function setbcflux(scheme,stateL,stateR,gamma,surf,ext_side)
 
     flux    =   [0.0,0.0,0.0,0.0,0.0,0.0]
     n       =   [0.0,0.0,0.0]
@@ -14,7 +14,7 @@ function setbcflux(scheme,stateL,stateR,gamma,R,surf,ext_side)
     # Full State
     if bc_type==0
         
-        flux   =   getflux(scheme,stateL,stateR,gamma,R,n,Area)
+        flux   =   getflux(scheme,stateL,stateR,gamma,n,Area)
     
     # Inviscid Wall
     elseif bc_type==1
@@ -25,8 +25,6 @@ function setbcflux(scheme,stateL,stateR,gamma,R,surf,ext_side)
             state = stateL
         end
 
-        stateb[1] = state[1]
-
         ρv      =   [0.0,0.0,0.0]
 
         ρv[1]   =   state[2]
@@ -34,7 +32,14 @@ function setbcflux(scheme,stateL,stateR,gamma,R,surf,ext_side)
         ρv[3]   =   state[4]
 
         ρv_n    =   (ρv'*n)*n
+        v_b     =   (ρv-ρv_n)/state[1]
+        p_b     =   (gamma-1)*(state[5]-0.5*state[1]*(v_b[1]^2+v_b[2]^2+v_b[3]^2))
 
+        flux[2] =   p_b*n[1]
+        flux[3] =   p_b*n[2]
+        flux[4] =   p_b*n[3]
+
+        #=
         stateb[2] = ρv[1]-2*ρv_n[1]
         stateb[3] = ρv[2]-2*ρv_n[2]
         stateb[4] = ρv[3]-2*ρv_n[3]
@@ -42,10 +47,13 @@ function setbcflux(scheme,stateL,stateR,gamma,R,surf,ext_side)
         stateb[5] = state[5]
 
         if ext_side==0
-            flux   =   getflux(scheme,stateb,state,gamma,R,n,Area)
+            flux   =   getflux(scheme,stateb,state,gamma,n,Area)
         else
-            flux   =   getflux(scheme,state,stateb,gamma,R,n,Area)
+            flux   =   getflux(scheme,state,stateb,gamma,n,Area)
         end
+        =#
+
+
 
     # Inflow
     elseif bc_type==2
@@ -136,6 +144,31 @@ function setbcflux(scheme,stateL,stateR,gamma,R,surf,ext_side)
 
         flux    =   F*n
     
+    # Supersonic Outflow
+    elseif bc_type==4
+
+        if ext_side==0
+            state   =   stateR
+        else
+            state   =   stateL
+        end
+
+        ρ_b     =   state[1]
+        v_b     =   [0.0,0.0,0.0]
+        v_b[1]  =   state[2]/state[1]
+        v_b[2]  =   state[3]/state[1]
+        v_b[3]  =   state[4]/state[1]
+        ρeb     =   state[5]
+
+        F       =   [ρ_b*v_b[1]             ρ_b*v_b[2]              ρ_b*v_b[3]
+                     ρ_b*v_b[1]*v_b[1]+p_b  ρ_b*v_b[1]*v_b[2]       ρ_b*v_b[1]*v_b[3]
+                     ρ_b*v_b[2]*v_b[1]      ρ_b*v_b[2]*v_b[2]+p_b   ρ_b*v_b[2]*v_b[3]
+                     ρ_b*v_b[3]*v_b[1]      ρ_b*v_b[3]*v_b[2]       ρ_b*v_b[3]*v_b[3]+p_b
+                     ρeb*v_b[1]+v_b[1]*p_b  ρeb*v_b[2]+v_b[2]*p_b   ρ_b*v_b[3]+v_b[3]*p_b
+                     0.0                    0.0                     0.0                  ]
+
+        flux    =   F*n
+
     end
 
     return flux
