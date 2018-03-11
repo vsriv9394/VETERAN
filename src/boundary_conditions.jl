@@ -1,6 +1,13 @@
-function setbcflux(scheme,stateL,stateR,gamma,surf,ext_side)
+function setbcflux(scheme_conv,scheme_visc,gradL,gradR,stateL,stateR,gamma,Pr,mu,surf,ext_side)
 
+    #--------------------------------------------------------------------------------------------------
+    # Initialize Output
+    #--------------------------------------------------------------------------------------------------
     flux    =   [0.0,0.0,0.0,0.0,0.0,0.0]
+
+    #--------------------------------------------------------------------------------------------------
+    # Extract information from surface data
+    #--------------------------------------------------------------------------------------------------
     n       =   [0.0,0.0,0.0]
     Area    =   sqrt(surf[1]^2+surf[2]^2+surf[3]^2)
     n[1]    =   surf[1]/Area
@@ -8,13 +15,16 @@ function setbcflux(scheme,stateL,stateR,gamma,surf,ext_side)
     n[3]    =   surf[3]/Area
     bc_type =   surf[4]
 
+    #--------------------------------------------------------------------------------------------------
+    # Initialize state vectors for boundadry surfaces
+    #--------------------------------------------------------------------------------------------------
     state   =   [0.0,0.0,0.0,0.0,0.0,0.0]
     stateb  =   [0.0,0.0,0.0,0.0,0.0,0.0]
 
     # Full State
     if bc_type==0
         
-        flux   =   getflux(scheme,stateL,stateR,gamma,n,Area)
+        flux   =   getConvFlux(scheme_conv,stateL,stateR,gamma,n,Area)#-getViscFlux(scheme_visc,stateL,stateR,gradL,gradR,gamma,Pr,mu,n)
     
     # Inviscid Wall
     elseif bc_type==1
@@ -53,10 +63,33 @@ function setbcflux(scheme,stateL,stateR,gamma,surf,ext_side)
         end
         =#
 
+    # Viscous Wall
+    elseif bc_type==2
+        
+        if ext_side==0
+            state = stateR
+            grad  = gradR
+        else
+            state = stateL
+            grad  = gradL
+        end
 
+        stateb  =   copy(state)
+
+        stateb[2]   =   -state[2]   
+        stateb[3]   =   -state[3]   
+        stateb[4]   =   -state[4]
+
+        gradb   =   copy(grad)
+
+        if ext_side==0
+            flux   =   getConvFlux(scheme_conv,stateb,state,gamma,n,Area)#-getViscFlux(scheme_visc,stateb,state,gradb,grad,gamma,Pr,mu,n)
+        else
+            flux   =   getConvFlux(scheme_conv,state,stateb,gamma,n,Area)#-getViscFlux(scheme_visc,state,stateb,grad,gradb,gamma,Pr,mu,n)
+        end
 
     # Inflow
-    elseif bc_type==2
+    elseif bc_type==3
     
         # stateb    c_t, n_in_x, n_in_y, n_in_z, p_t
         if ext_side==0
@@ -106,7 +139,7 @@ function setbcflux(scheme,stateL,stateR,gamma,surf,ext_side)
         flux    =   F*n
 
     # Subsonic Outflow
-    elseif bc_type==3
+    elseif bc_type==4
         
         if ext_side==0
             state   =   stateR
@@ -145,7 +178,7 @@ function setbcflux(scheme,stateL,stateR,gamma,surf,ext_side)
         flux    =   F*n
     
     # Supersonic Outflow
-    elseif bc_type==4
+    elseif bc_type==5
 
         if ext_side==0
             state   =   stateR
