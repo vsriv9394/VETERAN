@@ -24,7 +24,7 @@ function setbcflux(scheme_conv,scheme_visc,gradL,gradR,stateL,stateR,gamma,Pr,mu
     # Full State
     if bc_type==0
         
-        flux   =   getConvFlux(scheme_conv,stateL,stateR,gamma,n,Area)#-getViscFlux(scheme_visc,stateL,stateR,gradL,gradR,gamma,Pr,mu,n)
+        flux   =   getConvFlux(scheme_conv,stateL,stateR,gamma,n,Area)
     
     # Inviscid Wall
     elseif bc_type==1
@@ -83,9 +83,9 @@ function setbcflux(scheme_conv,scheme_visc,gradL,gradR,stateL,stateR,gamma,Pr,mu
         gradb   =   copy(grad)
 
         if ext_side==0
-            flux   =   getConvFlux(scheme_conv,stateb,state,gamma,n,Area)#-getViscFlux(scheme_visc,stateb,state,gradb,grad,gamma,Pr,mu,n)
+            flux   =   getConvFlux(scheme_conv,stateb,state,gamma,n,Area)
         else
-            flux   =   getConvFlux(scheme_conv,state,stateb,gamma,n,Area)#-getViscFlux(scheme_visc,state,stateb,grad,gradb,gamma,Pr,mu,n)
+            flux   =   getConvFlux(scheme_conv,state,stateb,gamma,n,Area)
         end
 
     # Inflow

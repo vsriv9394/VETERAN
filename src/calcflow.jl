@@ -30,6 +30,9 @@ function flow_eval(scheme_conv,scheme_visc,Cells,SurfX,SurfY,SurfZ,gamma,Pr,mu)
     #---------------------------------------------------------------------------
     surf    =   [0.0,0.0,0.0,0.0]
 
+    #---------------------------------------------------------------------------
+    # Evaluate gradients for the flow
+    #---------------------------------------------------------------------------
     #Grads   =   reconstruct(Cells,SurfX,SurfY,SurfZ,gamma)
 
     
